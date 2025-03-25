@@ -32,8 +32,7 @@ This is a **MERN Stack** (MongoDB, Express.js, React.js, Node.js) project. It is
 
 ### 🌍 **Live Preview**  
 🔗 [Live Website](https://your-frontend-site-link.com) 
-[![Neon](https://i.ibb.co.com/27xbMTRH/screencapture-localhost-5173-2025-03-25-16-03-58.png)](https://plantner.netlify.app)
 
 ### 🖼 **Screenshots**  
-![Home Page](https://i.ibb.co.com/27xbMTRH/screencapture-localhost-5173-2025-03-25-16-03-58.png)  
+![Home Page](https://i.ibb.co.com/27xbMTRH/screencapture-localhost-5173-2025-03-25-16-03-58.png)(https://plantner.netlify.app)  
 ![Dashboard](https://i.ibb.co.com/ZRLNJDk4/screencapture-localhost-5173-dashboard-2025-03-25-16-04-42.png) 
