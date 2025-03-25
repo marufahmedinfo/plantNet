@@ -6,11 +6,59 @@ import {
   DialogPanel,
   DialogTitle,
 } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 
 import UpdatePlantForm from '../Form/UpdatePlantForm'
+import { imageUpload } from '../../api/utils'
+import useAxiosSecure from '../../hooks/useAxiosSecure'
+import toast from 'react-hot-toast'
 
-const UpdatePlantModal = ({ setIsEditModalOpen, isOpen }) => {
+const UpdatePlantModal = ({ setIsEditModalOpen, isOpen, plantId, refetch }) => {
+  const axiosSecure = useAxiosSecure()
+  const [uploadImage, setUploadImage] = useState({ image: { name: 'Upload Image' } });
+  const [loading, setLoading] = useState(false);
+
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    const form = e.target;
+    const name = form.name.value;
+    const description = form.description.value;
+    const category = form.category.value;
+    const price = parseFloat(form.price.value);
+    const quantity = parseInt(form.quantity.value);
+    const image = form.image.files[0];
+    const imageUrl = await imageUpload(image);
+
+    // Create plant data object
+    const plantData = {
+      name,
+      category,
+      description,
+      price,
+      quantity,
+      image: imageUrl,
+    }
+    // console.table(plantData);
+
+    // update plant in db
+
+    try {
+      // update req
+      await axiosSecure.put(`/plants/${plantId}`, plantData)
+      refetch()
+      toast.success('Data Update Successfully!')
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response?.data)
+    } finally {
+      setLoading(false)
+      setIsEditModalOpen(false)
+    }
+  }
+
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -49,7 +97,13 @@ const UpdatePlantModal = ({ setIsEditModalOpen, isOpen }) => {
                   Update Plant Info
                 </DialogTitle>
                 <div className='mt-2 w-full'>
-                  <UpdatePlantForm />
+                  <UpdatePlantForm
+                    plantId={plantId}
+                    uploadImage={uploadImage}
+                    setUploadImage={setUploadImage}
+                    loading={loading}
+                    handleUpdate={handleUpdate}
+                  />
                 </div>
                 <hr className='mt-8 ' />
                 <div className='mt-2 '>
@@ -73,6 +127,8 @@ const UpdatePlantModal = ({ setIsEditModalOpen, isOpen }) => {
 UpdatePlantModal.propTypes = {
   setIsEditModalOpen: PropTypes.func,
   isOpen: PropTypes.bool,
+  plantId: PropTypes.string,
+  refetch: PropTypes.func,
 }
 
 export default UpdatePlantModal

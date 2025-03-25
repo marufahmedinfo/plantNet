@@ -1,7 +1,16 @@
 import PropTypes from 'prop-types'
-const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
+const Button = ({
+  label,
+  onClick,
+  disabled,
+  outline,
+  small,
+  icon: Icon,
+  type='button'
+}) => {
   return (
     <button
+    type={type}
       disabled={disabled}
       onClick={onClick}
       className={`
@@ -41,9 +50,10 @@ Button.propTypes = {
   label: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  outline: PropTypes.bool,
+  outline: PropTypes.string,
   small: PropTypes.bool,
   icon: PropTypes.elementType,
+  type: PropTypes.string,
 }
 
 export default Button

@@ -1,7 +1,33 @@
-const UpdatePlantForm = () => {
+import LoadingSpinner from "../Shared/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import PropTypes from "prop-types";
+import { TbFidgetSpinner } from "react-icons/tb";
+
+
+const UpdatePlantForm = ({ plantId, uploadImage, setUploadImage, loading, handleUpdate }) => {
+  // const { id } = useParams()
+  // // let [isOpen, setIsOpen] = useState(false)
+  const {
+    data: plants = {},
+    isLoading
+  } = useQuery({
+    queryKey: ['plant', plantId],
+    queryFn: async () => {
+      const { data } = await axios(
+        `${import.meta.env.VITE_API_URL}/plants/${plantId}`
+      )
+      return data
+    },
+
+  });
+  // console.log(plants);
+
+  const { category, description, image, price, name, quantity } = plants || {}
+  if (isLoading) return <LoadingSpinner />
   return (
     <div className='w-full flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50'>
-      <form>
+      <form onSubmit={handleUpdate}>
         <div className='grid grid-cols-1 gap-10'>
           <div className='space-y-6'>
             {/* Name */}
@@ -13,6 +39,7 @@ const UpdatePlantForm = () => {
                 className='w-full px-4 py-3 text-gray-800 border border-lime-300 focus:outline-lime-500 rounded-md bg-white'
                 name='name'
                 id='name'
+                defaultValue={name}
                 type='text'
                 placeholder='Plant Name'
                 required
@@ -27,6 +54,7 @@ const UpdatePlantForm = () => {
                 required
                 className='w-full px-4 py-3 border-lime-300 focus:outline-lime-500 rounded-md bg-white'
                 name='category'
+                defaultValue={category}
               >
                 <option value='Indoor'>Indoor</option>
                 <option value='Outdoor'>Outdoor</option>
@@ -41,6 +69,7 @@ const UpdatePlantForm = () => {
               </label>
 
               <textarea
+                defaultValue={description}
                 id='description'
                 placeholder='Write plant description here...'
                 className='block rounded-md focus:lime-300 w-full h-32 px-4 py-3 text-gray-800  border border-lime-300 bg-white focus:outline-lime-500 '
@@ -57,6 +86,7 @@ const UpdatePlantForm = () => {
                   Price
                 </label>
                 <input
+                  defaultValue={price}
                   className='w-full px-4 py-3 text-gray-800 border border-lime-300 focus:outline-lime-500 rounded-md bg-white'
                   name='price'
                   id='price'
@@ -72,6 +102,7 @@ const UpdatePlantForm = () => {
                   Quantity
                 </label>
                 <input
+                  defaultValue={quantity}
                   className='w-full px-4 py-3 text-gray-800 border border-lime-300 focus:outline-lime-500 rounded-md bg-white'
                   name='quantity'
                   id='quantity'
@@ -82,38 +113,67 @@ const UpdatePlantForm = () => {
               </div>
             </div>
             {/* Image */}
-            <div className=' p-4  w-full  m-auto rounded-lg flex-grow'>
+             <div className=' p-4  w-full  m-auto rounded-lg flex-grow'>
               <div className='file_upload px-5 py-3 relative border-4 border-dotted border-gray-300 rounded-lg'>
                 <div className='flex flex-col w-max mx-auto text-center'>
                   <label>
                     <input
+                      onChange={e =>
+                        setUploadImage({
+                          image: e.target.files[0],
+                          url: URL.createObjectURL(e.target.files[0]),
+                        })
+                      }
                       className='text-sm cursor-pointer w-36 hidden'
-                      type='file'
+                      type= 'file'
                       name='image'
                       id='image'
                       accept='image/*'
                       hidden
                     />
                     <div className='bg-lime-500 text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-lime-500'>
-                      Upload Image
+                      {uploadImage?.image?.name}
                     </div>
                   </label>
                 </div>
               </div>
-            </div>
-
+            </div> 
+            {(uploadImage && uploadImage?.image?.size) ? (
+              <div className='flex gap-5 items-center'>
+                <img className='w-20 rounded' src={uploadImage?.url} alt='Uploaded Image' />
+                <p className="font-semibold">Image Size: {uploadImage?.image?.size} Bytes</p>
+              </div>
+            ) : (
+              <div className='flex gap-5 items-center'>
+                {/* Default Image */}
+                <img className='w-20 rounded' src={image} alt='Default Image' />
+                <p className="font-semibold">No image uploaded</p>
+              </div>
+            )}
             {/* Submit Button */}
             <button
+
               type='submit'
               className='w-full p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-lime-500 '
             >
-              Update Plant
+              {loading ? (
+                <TbFidgetSpinner className='animate-spin m-auto' />
+              ) : (
+                'Update Plant'
+              )}
             </button>
           </div>
         </div>
       </form>
     </div>
   )
+}
+UpdatePlantForm.propTypes = {
+  handleUpdate: PropTypes.func,
+  uploadImage: PropTypes.object,
+  setUploadImage: PropTypes.func,
+  loading: PropTypes.bool,
+  plantId: PropTypes.string,
 }
 
 export default UpdatePlantForm
